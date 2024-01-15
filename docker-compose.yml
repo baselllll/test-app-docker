@@ -1,0 +1,53 @@
+  version: "3"
+  services:
+    node-test:
+      container_name: "node_test_container"
+      build: .
+      ports:
+        - "4000:4000"
+      env_file:
+        - ./.env
+      depends_on : 
+       - mongo
+       - postgres
+    mongo:
+      image: mongo
+      restart: always
+      volumes:
+        - mongo-db:/data/db
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: example
+    postgres:
+      image: postgres
+      restart: always
+      volumes:
+        - postgres-db:/var/lib/postgresql/data
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: example
+        
+    mongo-express:
+      image: mongo-express
+      restart: always
+      ports:
+        - 8081:8081
+      environment:
+        ME_CONFIG_MONGODB_ADMINUSERNAME: root
+        ME_CONFIG_MONGODB_ADMINPASSWORD: example
+        ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      depends_on : 
+        - mongo
+    nginx : 
+        image : nginx:stable-alpine
+        volumes:
+        - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        ports:
+        - "8080:80"
+        depends_on : 
+         - node-test
+    redis : 
+      image : redis
+  volumes:
+      mongo-db: 
+      postgres-db:

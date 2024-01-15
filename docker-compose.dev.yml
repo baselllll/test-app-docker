@@ -1,0 +1,13 @@
+version: "3"
+services:
+   node-test:
+    volumes:
+      - ./src:/app/src:ro
+    build: 
+      context: .
+      target: development
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "5000:4000"
+    command: npm run start-dev
